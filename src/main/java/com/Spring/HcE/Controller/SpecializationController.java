@@ -23,6 +23,8 @@ public class SpecializationController {
 
 	@Autowired
 	ISpecializationService specService;
+
+	/* Login Page */
 	
 	@RequestMapping("/login")
 	public String loginPage() {
@@ -65,5 +67,13 @@ public class SpecializationController {
 		specService.removeSpecialization(Id);
 		attributes.addAttribute("message", "Record ("+Id+") is deleted.");
 		return "redirect:all";
+	}
+	/*5. Fetch data into Edit Page */
+	@GetMapping("/edit")
+	public String showEditPage(@RequestParam Long Id, Model model) {
+		Specialization spec=  specService.getOneSpecialization(Id);
+		model.addAttribute("specialization", spec);
+		return "SpecializationEdit";
+		
 	}
 }
