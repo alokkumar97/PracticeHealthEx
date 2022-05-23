@@ -59,7 +59,9 @@ public class SpecializationController {
 		model.addAttribute("message", message);
 		return "SpecializationData";
 	} 
-	/* 4. Delete By Id */
+	/**
+	 * 4. Delete by Id
+	 * */
 	
 	@GetMapping("/delete")
 	public String deleteSpecialization(@RequestParam Long Id,
@@ -68,12 +70,23 @@ public class SpecializationController {
 		attributes.addAttribute("message", "Record ("+Id+") is deleted.");
 		return "redirect:all";
 	}
-	/*5. Fetch data into Edit Page */
+	/* 
+	 * 5. Fetch data into Edit Page
+	 */
 	@GetMapping("/edit")
 	public String showEditPage(@RequestParam Long Id, Model model) {
 		Specialization spec=  specService.getOneSpecialization(Id);
 		model.addAttribute("specialization", spec);
 		return "SpecializationEdit";
-		
+	}
+	/**
+	 * 6. Update data and Show in all page
+	 * */
+	@PostMapping("/update")
+	public String updateData(@ModelAttribute Specialization spec,RedirectAttributes attributes) {
+		specService.updateSpecialization(spec);
+		attributes.addAttribute("message", "Record ("+spec.getSpecId()+") is updated.");
+		return "redirect:all";
 	}
 }
+
