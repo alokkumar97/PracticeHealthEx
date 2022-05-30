@@ -3,6 +3,8 @@ package com.Spring.HcE.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,9 +14,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.Spring.HcE.Model.Specialization;
+import com.Spring.HcE.Model.User_Details;
 import com.Spring.HcE.Service.ISpecializationService;
 
 @Controller
@@ -29,6 +33,28 @@ public class SpecializationController {
 	@RequestMapping("/login")
 	public String loginPage() {
 		return "login";
+	}
+	/* *
+	 * login Authentication and authorization 
+	 * */
+	
+	@PostMapping("/signin")
+	public String signInPage(@ModelAttribute ) {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username=null;
+		if(principal instanceof UserDetails) {
+			username=((User_Details) principal).getEmail();
+		}else {
+			username = principal.toString();
+		}
+		StringBuilder redirectAll= new  StringBuilder();
+		if(username != null) {
+			redirectAll.append("redirect:/spec/all");
+		}else {
+			redirectAll.append("redirect:/spec/login");
+		}
+		return redirectAll.toString();
+		
 	}
 	
 	/* *
@@ -87,6 +113,19 @@ public class SpecializationController {
 		specService.updateSpecialization(spec);
 		attributes.addAttribute("message", "Record ("+spec.getSpecId()+") is updated.");
 		return "redirect:all";
+	}
+	
+	/**
+	 * 7. Read code and check with service
+	 *     Return message to UI
+	 */
+	@GetMapping("/checkCode")
+	public @ResponseBody String validateSpecCode(@RequestParam String code) {
+		String message="";
+		if(specService.isSpecCodeExist(code)) {
+			message= code+", altready exist";
+		}
+		return message;	
 	}
 }
 
